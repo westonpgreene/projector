@@ -47,4 +47,6 @@ func main() {
 	router.GET("/orders", retrieveOrder)
 	router.PUT("/orders", updateOrder)
 	router.DELETE("/orders", deleteOrder)
+
+	router.Run("localhost:8080")
 }
