@@ -28,3 +28,28 @@ func GetOrders(ctx *gin.Context) {
 	db.DB.Find(&orders)
 	ctx.JSON(http.StatusOK, orders)
 }
+
+func UpdateOrder(ctx *gin.Context) {
+	id := ctx.Param("id")
+	var order models.Order
+	if err := db.DB.First(&order, id).Error; err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": "order not found"})
+		return
+	}
+	var req models.UpdateOrderRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	db.DB.Model(&order).Updates(req)
+	ctx.JSON(http.StatusOK, order)
+}
+
+func DeleteOrder(ctx *gin.Context) {
+	id := ctx.Param("id")
+	if err := db.DB.Delete(&models.Order{}, id).Error; err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": "order not found"})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "order deleted"})
+}
