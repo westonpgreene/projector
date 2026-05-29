@@ -1,8 +1,9 @@
 package handlers
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 	"src/projector/db"
 	"src/projector/models"
 )
@@ -19,7 +20,10 @@ func CreateOrder(ctx *gin.Context) {
 		Status:       models.Pending,
 		DeliveryDate: req.DeliveryDate,
 	}
-	db.DB.Create(&order)
+	if err := db.DB.Create(&order).Error; err != nil {
+		ctx.JSON(http.StatusConflict, gin.H{"error": "order already exists"})
+		return
+	}
 	ctx.JSON(http.StatusCreated, order)
 }
 
@@ -32,7 +36,7 @@ func GetOrders(ctx *gin.Context) {
 func UpdateOrder(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var order models.Order
-	if err := db.DB.First(&order, id).Error; err != nil {
+	if err := db.DB.First(&order, "id = ?", id).Error; err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"error": "order not found"})
 		return
 	}
@@ -47,7 +51,10 @@ func UpdateOrder(ctx *gin.Context) {
 
 func DeleteOrder(ctx *gin.Context) {
 	id := ctx.Param("id")
-	if err := db.DB.Delete(&models.Order{}, id).Error; err != nil {
+	if result := db.DB.Where("id = ?", id).Delete(&models.Order{}); result.Error != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		return
+	} else if result.RowsAffected == 0 {
 		ctx.JSON(http.StatusNotFound, gin.H{"error": "order not found"})
 		return
 	}
