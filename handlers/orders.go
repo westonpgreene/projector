@@ -13,14 +13,18 @@ func CreateOrder(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
 	order := models.Order{
 		ClientName:   req.ClientName,
 		ProjectType:  req.ProjectType,
 		Status:       models.Pending,
 		DeliveryDate: req.DeliveryDate,
 	}
-
 	db.DB.Create(&order)
 	ctx.JSON(http.StatusCreated, order)
+}
+
+func GetOrders(ctx *gin.Context) {
+	var orders []models.Order
+	db.DB.Find(&orders)
+	ctx.JSON(http.StatusOK, orders)
 }
