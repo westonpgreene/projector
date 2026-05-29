@@ -1,55 +1,22 @@
 package main
 
 import (
-	"time"
-
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
-
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
+	"log"
+	"src/projector/db"
+	"src/projector/handlers"
 )
-
-type ProjectType int
-type Status int
-
-const (
-	Pending    Status = iota
-	InProgress        = 1
-	Completed         = 2
-)
-
-type Order struct {
-	ID           uuid.UUID
-	clientName   string
-	projectType  ProjectType
-	status       Status
-	deliveryDate time.Time
-}
-
-func createOrder(ctx *gin.Context) {
-
-}
-
-func retrieveOrder(ctx *gin.Context) {
-
-}
-
-func updateOrder(ctx *gin.Context) {
-
-}
-
-func deleteOrder(ctx *gin.Context) {
-
-}
 
 func main() {
-	router := gin.Default()
+	if err := db.Init(); err != nil {
+		log.Fatal("failed to connect to database:", err)
+	}
 
-	router.POST("/orders", createOrder)
-	router.GET("/orders", retrieveOrder)
-	router.PUT("/orders", updateOrder)
-	router.DELETE("/orders", deleteOrder)
+	router := gin.Default()
+	router.POST("/orders", handlers.CreateOrder)
+	router.GET("/orders", handlers.GetOrders)
+	router.PUT("/orders/:id", handlers.UpdateOrder)
+	router.DELETE("/orders/:id", handlers.DeleteOrder)
 
 	router.Run("localhost:8080")
 }
