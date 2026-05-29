@@ -14,6 +14,10 @@ func CreateOrder(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	if err := req.Validate(); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 	order := models.Order{
 		ClientName:   req.ClientName,
 		ProjectType:  req.ProjectType,
@@ -29,7 +33,10 @@ func CreateOrder(ctx *gin.Context) {
 
 func GetOrders(ctx *gin.Context) {
 	var orders []models.Order
-	db.DB.Find(&orders)
+	if err := db.DB.Find(&orders).Error; err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to retrieve orders"})
+		return
+	}
 	ctx.JSON(http.StatusOK, orders)
 }
 
@@ -45,7 +52,14 @@ func UpdateOrder(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	db.DB.Model(&order).Updates(req)
+	if err := req.Validate(); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if err := db.DB.Model(&order).Updates(req).Error; err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update order"})
+		return
+	}
 	ctx.JSON(http.StatusOK, order)
 }
 

@@ -3,13 +3,14 @@ package models
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
-type ProjectType int
+type ProjectType string
 type Status int
 
 const (
@@ -78,9 +79,35 @@ type CreateOrderRequest struct {
 	DeliveryDate time.Time   `json:"delivery_date" binding:"required"`
 }
 
+func (r CreateOrderRequest) Validate() error {
+	if strings.TrimSpace(r.ClientName) == "" {
+		return fmt.Errorf("client_name cannot be blank")
+	}
+	if strings.TrimSpace(string(r.ProjectType)) == "" {
+		return fmt.Errorf("project_type cannot be blank")
+	}
+	if !r.DeliveryDate.After(time.Now()) {
+		return fmt.Errorf("delivery_date must be in the future")
+	}
+	return nil
+}
+
 type UpdateOrderRequest struct {
 	ClientName   string      `json:"client_name"`
 	ProjectType  ProjectType `json:"project_type"`
 	Status       Status      `json:"status"`
 	DeliveryDate time.Time   `json:"delivery_date"`
+}
+
+func (r UpdateOrderRequest) Validate() error {
+	if r.ClientName != "" && strings.TrimSpace(r.ClientName) == "" {
+		return fmt.Errorf("client_name cannot be blank")
+	}
+	if r.ProjectType != "" && strings.TrimSpace(string(r.ProjectType)) == "" {
+		return fmt.Errorf("project_type cannot be blank")
+	}
+	if !r.DeliveryDate.IsZero() && !r.DeliveryDate.After(time.Now()) {
+		return fmt.Errorf("delivery_date must be in the future")
+	}
+	return nil
 }
