@@ -1,6 +1,8 @@
 package models
 
 import (
+	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -15,6 +17,39 @@ const (
 	InProgress Status = 1
 	Completed  Status = 2
 )
+
+var statusNames = map[Status]string{
+	Pending:    "Pending",
+	InProgress: "In Progress",
+	Completed:  "Completed",
+}
+
+var statusValues = map[string]Status{
+	"Pending":     Pending,
+	"In Progress": InProgress,
+	"Completed":   Completed,
+}
+
+func (s Status) MarshalJSON() ([]byte, error) {
+	name, ok := statusNames[s]
+	if !ok {
+		return nil, fmt.Errorf("unknown status: %d", s)
+	}
+	return json.Marshal(name)
+}
+
+func (s *Status) UnmarshalJSON(data []byte) error {
+	var name string
+	if err := json.Unmarshal(data, &name); err != nil {
+		return err
+	}
+	val, ok := statusValues[name]
+	if !ok {
+		return fmt.Errorf("unknown status: %q", name)
+	}
+	*s = val
+	return nil
+}
 
 type Order struct {
 	ID           string         `gorm:"primaryKey"                  json:"id"`
