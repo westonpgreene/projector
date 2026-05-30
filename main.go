@@ -1,10 +1,12 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"log"
+
+	"github.com/gin-gonic/gin"
 	"src/projector/db"
 	"src/projector/handlers"
+	"src/projector/middleware"
 )
 
 func main() {
@@ -13,10 +15,17 @@ func main() {
 	}
 
 	router := gin.Default()
-	router.POST("/orders", handlers.CreateOrder)
-	router.GET("/orders", handlers.GetOrders)
-	router.PUT("/orders/:id", handlers.UpdateOrder)
-	router.DELETE("/orders/:id", handlers.DeleteOrder)
+
+	router.POST("/keys", handlers.CreateKey)
+
+	auth := router.Group("/")
+	auth.Use(middleware.APIKeyAuth())
+	{
+		auth.POST("/orders", handlers.CreateOrder)
+		auth.GET("/orders", handlers.GetOrders)
+		auth.PUT("/orders/:id", handlers.UpdateOrder)
+		auth.DELETE("/orders/:id", handlers.DeleteOrder)
+	}
 
 	router.Run("localhost:8080")
 }
