@@ -14,7 +14,7 @@ cd projector
 
 Install dependencies.
 ```
-go get go.mod
+go get .
 ```
 
 Launch the internal Gin server.
