@@ -4,6 +4,10 @@ Projector is a backend REST API that powers our frontend for managing client ord
 ## Installation
 ### Prerequisites
 - Go
+- Docker
+
+## Technical Details
+Projector was built using the Gin REST library, and relies on SQLite as the database, coupled with GORM as the ORM for handling model definitions and translations to and from the database.
 
 ### Running Standalone
 Clone the repository.
@@ -36,7 +40,7 @@ docker run -p 5000:5000 -v $(pwd)/data:/app/data projector
 ## Usage
 Projector can be used to create, retrieve, update, and delete the orders we have stored in the database, implemented using SQLite. In production, we would likely opt to use a more robust technology, likely PostgreSQL.
 
-> If I were pushing this to AWS, I would leverage DynamoDB for this.
+> If I were pushing this to AWS, I would leverage DynamoDB. But for the purposes of this example, we used SQLite.
 
 1. Generate an API token that you can use to authenticate yourself.
 ```
