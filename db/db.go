@@ -14,6 +14,6 @@ func Init() error {
     if err != nil {
         return err
     }
-    return DB.AutoMigrate(&models.Order{})
+    return DB.AutoMigrate(&models.Order{}, &models.APIKey{})
 }
 
