@@ -27,5 +27,5 @@ func main() {
 		auth.DELETE("/orders/:id", handlers.DeleteOrder)
 	}
 
-	router.Run("localhost:8080")
+	router.Run("0.0.0.0:5000")
 }

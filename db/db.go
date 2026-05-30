@@ -1,19 +1,23 @@
 package db
 
 import (
-    "src/projector/models"
-    "gorm.io/driver/sqlite"
-    "gorm.io/gorm"
+	"os"
+
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+	"src/projector/models"
 )
 
 var DB *gorm.DB
 
 func Init() error {
-    var err error
-    DB, err = gorm.Open(sqlite.Open("orders.db"), &gorm.Config{})
-    if err != nil {
-        return err
-    }
-    return DB.AutoMigrate(&models.Order{}, &models.APIKey{})
+	if err := os.MkdirAll("data", 0755); err != nil {
+		return err
+	}
+	var err error
+	DB, err = gorm.Open(sqlite.Open("data/orders.db"), &gorm.Config{})
+	if err != nil {
+		return err
+	}
+	return DB.AutoMigrate(&models.Order{}, &models.APIKey{})
 }
-
