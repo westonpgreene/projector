@@ -134,3 +134,9 @@ The output from this example:
   "message": "order deleted"
 }
 ```
+
+## Unit Tests
+The `handlers/orders_test.go` handles unit testing the POST /orders endpoint for the API. To run this, execute the following:
+```
+go test ./handlers/ -v
+```
